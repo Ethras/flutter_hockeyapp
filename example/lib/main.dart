@@ -54,7 +54,7 @@ class _MyAppState extends State<MyApp> {
               new TextField(
                 controller: tokenTextController,
                 decoration:
-                    InputDecoration(hintText: "Enter HockeyApp token (AppId)"),
+                    new InputDecoration(hintText: "Enter HockeyApp token (AppId)"),
               ),
               new RaisedButton(
                   onPressed: () async {
