@@ -11,8 +11,13 @@ class FlutterHockeyapp {
     return version;
   }
 
-  static Future<bool> configure() async {
-    final bool res = await _channel.invokeMethod('configure');
+  static Future<bool> start() async {
+    final bool res = await _channel.invokeMethod('start');
+    return res;
+  }
+
+  static Future<bool> configure(String token) async {
+    final bool res = await _channel.invokeMethod('configure', {"token": token});
     return res;
   }
 

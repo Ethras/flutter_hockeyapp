@@ -21,14 +21,20 @@ class FlutterHockeyappPlugin(private val registrar: Registrar) : MethodCallHandl
         }
     }
 
-    private var _initialized: Boolean = false;
+    private var _initialized: Boolean = false
+    private var _token: String = ""
 
     override fun onMethodCall(call: MethodCall, result: Result): Unit {
         when (call.method) {
             "getPlatformVersion" -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
+            "start" -> {
+                Log.i("HockeyApp", "Starting HockeyApp SDK...")
+                start()
+                result.success(true)
+            }
             "configure" -> {
                 Log.i("HockeyApp", "Configuring HockeyApp SDK...")
-                configure()
+                configure(call.argument("token"))
                 result.success(true)
             }
             "showFeedback" -> {
@@ -55,16 +61,26 @@ class FlutterHockeyappPlugin(private val registrar: Registrar) : MethodCallHandl
         MetricsManager.trackEvent(eventName);
     }
 
-    private fun configure() {
-        FeedbackManager.register(registrar.context())
-        CrashManager.register(registrar.context())
-        MetricsManager.register(registrar.activity().application)
+    private fun configure(token: String) {
+        _token = token
+        _initialized = true
+    }
 
-        MetricsManager.trackEvent("HockeyApp SDK configured successfully");
+    private fun start() {
+        if (_initialized) {
+            FeedbackManager.register(registrar.context(), _token)
+            CrashManager.register(registrar.context(), _token)
+            MetricsManager.register(registrar.activity().application, _token)
+
+            MetricsManager.trackEvent("HockeyApp SDK configured successfully");
+        } else Log.e("HockeyApp", "HockeyApp not initialized")
     }
 
     private fun checkForUpdates() {
-        UpdateManager.register(registrar.activity(), _UpdateListener())
+        if (_initialized) {
+            UpdateManager.register(registrar.activity(), _token, _UpdateListener())
+        } else Log.e("HockeyApp", "HockeyApp not initialized")
+
     }
 
     private fun showFeedback() {
