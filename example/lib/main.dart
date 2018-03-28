@@ -11,7 +11,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  TextEditingController controller = TextEditingController();
+  TextEditingController eventTextController = TextEditingController();
+  TextEditingController tokenTextController = TextEditingController();
 
   @override
   initState() {
@@ -50,11 +51,23 @@ class _MyAppState extends State<MyApp> {
           child: new Column(
             children: <Widget>[
               new Text('Running on: $_platformVersion\n'),
+              new TextField(
+                controller: tokenTextController,
+                decoration:
+                    InputDecoration(hintText: "Enter HockeyApp token (AppId)"),
+              ),
               new RaisedButton(
                   onPressed: () async {
-                    await FlutterHockeyapp.configure();
+                    if (tokenTextController.text != null)
+                      await FlutterHockeyapp
+                          .configure(tokenTextController.text);
                   },
                   child: new Text("Configure HockeyApp")),
+              new RaisedButton(
+                  onPressed: () async {
+                    await FlutterHockeyapp.start();
+                  },
+                  child: new Text("Start HockeyAppp")),
               new RaisedButton(
                   onPressed: () async {
                     await FlutterHockeyapp.showFeedback();
@@ -65,11 +78,12 @@ class _MyAppState extends State<MyApp> {
                     await FlutterHockeyapp.checkForUpdates();
                   },
                   child: new Text("Check for updates")),
-              new TextField(controller: controller),
+              new TextField(controller: eventTextController),
               new RaisedButton(
                   onPressed: () async {
-                    if (controller.text.isNotEmpty)
-                      await FlutterHockeyapp.trackEvent(controller.text);
+                    if (eventTextController.text.isNotEmpty)
+                      await FlutterHockeyapp
+                          .trackEvent(eventTextController.text);
                   },
                   child: new Text("Track event"))
             ],
